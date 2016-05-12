@@ -1,5 +1,4 @@
- 
-// create an functional expression to wrap our code
+ // create an functional expression to wrap our code
  (function() {
 
      var indexFile = (location.pathname.match(/\/(index[^\.]*\.html)/) || ['', ''])[1],
@@ -8,7 +7,7 @@
          headEl = document.getElementsByTagName('head')[0],
          sync = true;
 
-    // define our constructor
+     // define our constructor
      this.baseTag = function() {
 
          // Define option defaults 
@@ -22,36 +21,64 @@
              overlay: true
          }
 
-     }
-
-     //Public Methods
-     baseTag.prototype.addTags = function(list) {
-
-        if(!Array.isArray(list))
-        {
-            throw "The parameter value is not an Array";
-
-        }
-
-         for (var item in list) {
-
-             var keyName = Object.keys(list[item])[0];
-
-             switch (keyName) {
-                 case "script":
-                     addTag(keyName, list[item].script, sync);
-                     break;
-
-                 case "link":
-                     addTag(keyName, list[item].link, sync);
-                     break;
-             };
+         // Create options by extending defaults with the passed in arugments
+         if (arguments[0] && typeof arguments[0] === "object") {
+             this.options = extendDefaults(defaults, arguments[0]);
          }
 
      }
-     //End Public Methods
 
-    // Private Methods
+     // Utility method to extend defaults with options
+     function extendDefaults(source, properties) {
+         var property;
+         for (property in properties) {
+             if (properties.hasOwnProperty(property)) {
+                 source[property] = properties[property];
+             }
+         }
+         return source;
+     }
+
+     //Public Methods
+     baseTag.prototype.insertTags = function(list) {
+
+             if (!Array.isArray(list)) {
+                 throw "The parameter value is not an Array";
+
+             }
+
+             for (var item in list) {
+
+                 var keyName = Object.keys(list[item])[0];
+
+                 switch (keyName) {
+                     case "script":
+                         addTag(keyName, list[item].script, sync);
+                         break;
+
+                     case "link":
+                         addTag(keyName, list[item].link, sync);
+                         break;
+                 };
+             }
+
+         }
+
+    baseTag.prototype.insertTag = function(name, attributes, sync)  
+    {
+         var el = document.createElement(name),
+             attrName;
+
+         for (attrName in attributes) {
+             el.setAttribute(attrName, attributes[attrName]);
+         }
+
+         sync ? document.write(outerHTML(el)) : headEl.appendChild(el);
+    }   
+
+    //End Public Methods
+
+     // Private Methods
      function addTag(name, attributes, sync) {
          var el = document.createElement(name),
              attrName;
@@ -79,7 +106,7 @@
      //END Private Methods
 
 
-          // addTag('base', {
+     // addTag('base', {
      //     href: baseUrl
      // });
      // addTag('link', {
